@@ -3,7 +3,7 @@ from scipy import io
 import data_analysis.spatial.preprocessing as pp
 import data_analysis.dim_reduction as dim_red
 import sys
-
+import scipy.io
 
 # Retrieve variables from MATLAB
 rate_maps = np.array(eval(sys.argv[1]))  # Convert input string to numpy array
@@ -13,11 +13,11 @@ grid_score = np.nan_to_num(grid_score, nan=0) # replace 'nan' entries with '0'
 
 
 # change rate_maps to have a shape that is convenient for the functions used in 'dimensionality reduction'
-i=0
+# to go around weird shaping of rate_maps and ignore 1st dimension
 rate_maps_all = []
 for i in range(len(grid_score)):
     eff_rate_map = np.nan_to_num(rate_maps[i][0], nan=0) # replace nan entries with zero
-    rate_maps_all.append(eff_rate_map) # to go around weird shaping of rate_maps and ignore 1st dimension
+    rate_maps_all.append(eff_rate_map) 
 
 has_nan = np.isnan(rate_maps_all).any() # optional: checks there still are any 'nan' entries
 
@@ -42,7 +42,7 @@ zscored_matrix = pp.zscore_spatial_autocorr(autocorrelograms)
 # Options: tsne or umap. args = perplexity for tsne and min_dist for umap
 args = [6] # tsne
 #args=[0.3] # umap
-reduced_data = dim_red.dim_red_algorithm('tsne', args, zscored_matrix, plots=True) 
+reduced_data = dim_red.dim_red_algorithm('tsne', args, zscored_matrix, plots=False) 
 
 
 #-------- Clustering of grid cell modules -------#
@@ -55,14 +55,15 @@ cluster_info = dim_red.clustering(reduced_data, autocorrelograms, grid_score, mi
 def grid_module_condition(cluster):
     return np.mean(cluster['grid_scores']) > 0.3
 
-modules = dim_red.id_grid_modules(reduced_data, cluster_info, condition=grid_module_condition, plots=True)
+modules = dim_red.id_grid_modules(reduced_data, cluster_info, condition=grid_module_condition, plots=False)
 print(modules)
 
-
+# Saves results to a .mat file
+scipy.io.savemat("grid_modules.mat", modules)
 
 
 #-------- Optional -------#
-# -- Plot autocorrelograms & rate maps of cell in modules --#
+#-- Plot autocorrelograms & rate maps of cell in modules --#
 
 #n_modules = max(modules.keys())
 #grid_mod_id = 1
@@ -92,5 +93,6 @@ print(modules)
 #        plt.savefig(os.path.join(folder_name, f'rate_map_neuron_{j}.png'), format='png')
         
 #    grid_mod_id+=1
+
 
 

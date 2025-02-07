@@ -79,13 +79,13 @@ def clustering(reduced_data, autocorrelograms, grid_score, min_neighbors):
     epsilon = distances[elbow_index]
 
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(distances)
-    plt.scatter(elbow_index, epsilon, color='red', label=f'Elbow (ε={epsilon:.2f})')
-    plt.xlabel('Points')
-    plt.ylabel(f'{min_neighbors}-th nearest neighbor distance')
-    plt.title('K-distance Graph')
-    plt.show()
+#    plt.figure(figsize=(10, 6))
+#    plt.plot(distances)
+#    plt.scatter(elbow_index, epsilon, color='red', label=f'Elbow (ε={epsilon:.2f})')
+#    plt.xlabel('Points')
+#    plt.ylabel(f'{min_neighbors}-th nearest neighbor distance')
+#    plt.title('K-distance Graph')
+#    plt.show()
 
     # Identify clusters
     dbscan = DBSCAN(eps=epsilon, min_samples= min_neighbors)
