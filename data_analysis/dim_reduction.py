@@ -134,10 +134,7 @@ def id_grid_modules(reduced_data, cluster_info, condition, plots=True):
 
     i=0
     m=1
-    modules = {0:{"index": [],
-                  "grid_scores": []}}
-
-   # modules = {0:[]}
+    modules = {}
 
     while i < n_clusters:
         if condition(cluster_info[i]):
@@ -148,13 +145,10 @@ def id_grid_modules(reduced_data, cluster_info, condition, plots=True):
             modules[m]["index"].extend(cluster_info[i]['index'])
             modules[m]["grid_scores"].extend(cluster_info[i]['grid_scores'])
 
-        #    modules[m] = cluster_info[i]['index']
             m+=1
         else:
-            modules[0]["index"].extend(cluster_info[i]['index'])
-            modules[0]["grid_scores"].extend(cluster_info[i]['grid_scores'])
+            pass
 
-        #    modules[0].extend(cluster_info[i]['index'])
         i+=1
 
     if plots == True:
