@@ -8,7 +8,7 @@ from sklearn.decomposition import PCA
 
 
 #-------- Import data from .mat file -------#
-def load_data(data_dir = "../data/", file="TestData_highGrid_trial1.mat"): 
+def load_data(data_dir = "./data/", file="TestData_highGrid_trial1.mat"): 
     """
     Loads data from a .mat file in data_dir
     File contains info about: cellID, rat 2D trajectory, spatial information, gridness
@@ -27,12 +27,9 @@ data = load_data()
 print(data.keys()) # print entries of data dictionary
 
 # Assign relevant variables
-is_grid = data['isGrid']
 rate_maps = data['rateMap']
 grid_score = data['gridness']
 grid_score = np.nan_to_num(grid_score, nan=0) # replace 'nan' entries with '0'
-ell_gridness = data['gridness_ell']
-ell_gridness = np.nan_to_num(ell_gridness, nan=0)  # replace 'nan' entries with '0'
 
 
 # change rate_maps to have a shape that is convenient for the functions used in 'dimensionality reduction'
@@ -71,7 +68,7 @@ reduced_data = dim_red.dim_red_algorithm('umap', args, zscored_matrix, plots=Tru
 #-------- Clustering of grid cell modules -------#
 # 4) Clustering
 # It returns a dict with info about the clusters (neuron index, grid scores, etc.)
-cluster_info = dim_red.clustering(reduced_data, autocorrelograms, grid_score,ell_gridness, min_neighbors=3)
+cluster_info = dim_red.clustering(reduced_data, autocorrelograms, grid_score, min_neighbors=3)
 
 
 # 5) Identify grid cell modules

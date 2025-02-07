@@ -8,7 +8,6 @@ from sklearn.manifold import TSNE
 import umap
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
-import data_analysis.spatial.grid_cells as grid
 from matplotlib.lines import Line2D
 from kneed import KneeLocator
 from sklearn.decomposition import PCA
@@ -48,23 +47,20 @@ def dim_red_algorithm(method, args, data, plots=True):
 
     return reduced_data
 
-def clustering(reduced_data, autocorrelograms, grid_score, ell_gridness, min_neighbors):
+def clustering(reduced_data, autocorrelograms, grid_score, min_neighbors):
 
     """
     Args:
     - reduced_data (ndarray):
     - autocorrelograms (ndarray):
     - grid_score (array):
-    - ell_gridness (array): 
     - min_neighbors (int):
 
     Returns:
     - cluster_info (dict): contains information of identified clusters. It is of the form
                             cluster_info = {
                                             0: {'index': [...],
-                                                'grid_scores': [...],
-                                                'ell_gridness': [...],
-                                                'grid_scales': [...]},
+                                                'grid_scores': [...]},
                                             1: { ...
                                             }
                             }
@@ -96,33 +92,25 @@ def clustering(reduced_data, autocorrelograms, grid_score, ell_gridness, min_nei
     labels = dbscan.fit_predict(reduced_data)
     n_clusters = np.max(labels) + 1
 
-    # Store cluster information (grid score and scale of all neurons in each cluster) in a dict:
-    # cluster_label: [grid scores], [grid scales]
+    # Store cluster information (grid score of all neurons in each cluster) in a dict:
+    # cluster_label: [grid scores]
     i = 0
     cluster_info = {}  # Initialize with an empty list for entry 0
 
     while i < n_clusters:
         neuron_index = []
         scores = []
-        ell_grid = []
-        scales = []
         for j, label in enumerate(labels):
             if label == i:
-                scales.append(grid.grid_scale(autocorrelograms[j])[0])
                 scores.append(grid_score[j][0])
-                ell_grid.append(ell_gridness[j][0])
                 neuron_index.append(j)
          
             cluster_info[i] = {"index": [],
-                               "grid_scores": [],
-                               "grid_ell": [],
-                               "grid_scales": []}
+                               "grid_scores": []}
     
             # Add the neuron data to the corresponding lists
             cluster_info[i]["index"].extend(neuron_index)
             cluster_info[i]["grid_scores"].extend(scores)
-            cluster_info[i]["grid_ell"].extend(ell_grid)
-            cluster_info[i]["grid_scales"].extend(scales)
         
         i+=1
 
@@ -147,32 +135,24 @@ def id_grid_modules(reduced_data, cluster_info, condition, plots=True):
     i=0
     m=1
     modules = {0:{"index": [],
-                  "grid_scores": [],
-                  "grid_ell": [],
-                  "grid_scales": []}}
+                  "grid_scores": []}}
 
    # modules = {0:[]}
 
     while i < n_clusters:
         if condition(cluster_info[i]):
             modules[m] = {"index": [],
-                          "grid_scores": [],
-                          "grid_ell": [],
-                          "grid_scales": []}
+                          "grid_scores": []}
     
             # Add the neuron data to the corresponding lists
             modules[m]["index"].extend(cluster_info[i]['index'])
             modules[m]["grid_scores"].extend(cluster_info[i]['grid_scores'])
-            modules[m]["grid_ell"].extend(cluster_info[i]['grid_ell'])
-            modules[m]["grid_scales"].extend(cluster_info[i]['grid_scales'])
 
         #    modules[m] = cluster_info[i]['index']
             m+=1
         else:
             modules[0]["index"].extend(cluster_info[i]['index'])
             modules[0]["grid_scores"].extend(cluster_info[i]['grid_scores'])
-            modules[0]["grid_ell"].extend(cluster_info[i]['grid_ell'])
-            modules[0]["grid_scales"].extend(cluster_info[i]['grid_scales'])
 
         #    modules[0].extend(cluster_info[i]['index'])
         i+=1
