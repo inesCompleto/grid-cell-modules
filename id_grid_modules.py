@@ -34,8 +34,6 @@ grid_score = np.nan_to_num(grid_score, nan=0) # replace 'nan' entries with '0'
 ell_gridness = data['gridness_ell']
 ell_gridness = np.nan_to_num(ell_gridness, nan=0)  # replace 'nan' entries with '0'
 
-traditional_grid_cells = [index for index, value in enumerate(is_grid) if value==1] # get index of grid cells
-                                                                                    # identified with traditional method
 
 # change rate_maps to have a shape that is convenient for the functions used in 'dimensionality reduction'
 i=0
@@ -87,59 +85,37 @@ print(modules)
 
 
 #-------- Optional -------#
-# Option 1) Print neurons only identified by traditional method and not by tsne/umap
 
-tsne_grid_cells = [index for key, value in modules.items() if key != 0 for index in value['index']] # Get index of grid cells identified by clustering algorithm
+# Option 1) Check autocorrelograms & rate maps of cell in modules
 
-only_in_traditional = list(set(traditional_grid_cells) - set(tsne_grid_cells)) # Get index of neurons only identified by traditional method as grid cells 
-print('Only traditional', only_in_traditional)
+#n_modules = max(modules.keys())
+#grid_mod_id = 1
 
-folder_name = f'Only_traditional_grids' # Define name of folder to save plots
-os.makedirs(folder_name, exist_ok=True)
+#while grid_mod_id <= n_modules:
+#    indices = modules[grid_mod_id]['index']
+#    selected_neurons = [autocorrelograms[j] for j in indices]
+#    mean_module = np.mean(selected_neurons, axis=0)    # Compute mean autocorrelogram of modules 
 
-for n in only_in_traditional:    # plot rate map of neurons only id by traditional method
-    plt.figure()
-    plt.title(f'Neuron {n}', fontsize=20)
-    plt.imshow(autocorrelograms[n])
-    plt.savefig(os.path.join(folder_name, f'autocorr_neuron_{n}.png'), format='png')
+#    folder_name = f'Mod{grid_mod_id}' # Creates folder to save plots
+#    os.makedirs(folder_name, exist_ok=True)
     
-    plt.figure()
-    plt.title(f'Neuron {n}', fontsize=20)
-    plt.imshow(rate_maps_all[n])
-    plt.savefig(os.path.join(folder_name, f'rate_map_neuron_{n}.png'), format='png')
+#    plt.figure()
+#    plt.title(f'Mean module {grid_mod_id}', fontsize=20)
+#    plt.imshow(mean_module)
+#    plt.savefig(os.path.join(folder_name, f'Mean_mod{grid_mod_id}.png'), format='png')
 
-
-
-# Option 2) Check autocorrelograms & rate maps of cell in modules
-
-n_modules = max(modules.keys())
-grid_mod_id = 1
-
-while grid_mod_id <= n_modules:
-    indices = modules[grid_mod_id]['index']
-    selected_neurons = [autocorrelograms[j] for j in indices]
-    mean_module = np.mean(selected_neurons, axis=0)    # Compute mean autocorrelogram of modules 
-
-    folder_name = f'Mod{grid_mod_id}' # Creates folder to save plots
-    os.makedirs(folder_name, exist_ok=True)
-    
-    plt.figure()
-    plt.title(f'Mean module {grid_mod_id}', fontsize=20)
-    plt.imshow(mean_module)
-    plt.savefig(os.path.join(folder_name, f'Mean_mod{grid_mod_id}.png'), format='png')
-
-    for j in indices:
-        plt.figure()
-        plt.title(f'Cluster {grid_mod_id}, neuron {j}', fontsize=20)
-        plt.imshow(autocorrelograms[j])
-        plt.savefig(os.path.join(folder_name, f'autocorr_neuron_{j}.png'), format='png')
+#    for j in indices:
+#        plt.figure()
+#        plt.title(f'Cluster {grid_mod_id}, neuron {j}', fontsize=20)
+#        plt.imshow(autocorrelograms[j])
+#        plt.savefig(os.path.join(folder_name, f'autocorr_neuron_{j}.png'), format='png')
         
-        plt.figure()
-        plt.title(f'Cluster {grid_mod_id}, neuron {j}', fontsize=20)
-        plt.imshow(rate_maps_all[j])
-        plt.savefig(os.path.join(folder_name, f'rate_map_neuron_{j}.png'), format='png')
+#        plt.figure()
+#        plt.title(f'Cluster {grid_mod_id}, neuron {j}', fontsize=20)
+#        plt.imshow(rate_maps_all[j])
+#        plt.savefig(os.path.join(folder_name, f'rate_map_neuron_{j}.png'), format='png')
         
-    grid_mod_id+=1
+#    grid_mod_id+=1
 
 
 
