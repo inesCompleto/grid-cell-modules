@@ -1,23 +1,41 @@
 import numpy as np
 from scipy import io
+import os
 import data_analysis.spatial.preprocessing as pp
 import data_analysis.dim_reduction as dim_red
-import sys
 import scipy.io
 
-# Retrieve variables from MATLAB
-rate_maps = np.array(eval(sys.argv[1]))  # Convert input string to numpy array
-grid_score = np.array(eval(sys.argv[2]))  # Convert input string to numpy array
 
+#-------- Import data from .mat file -------#
+def load_data(data_dir = "./data/", file="TestData_highGrid_trial1.mat"): 
+    """
+    Loads data from a .mat file in data_dir
+    File contains info about: cellID, rat 2D trajectory, spatial information, gridness
+    
+    Args:
+        - data_dir: pathway to file directory
+        - file: name of file to import
+    returns:
+        - mat_file (dict)
+    """
+    mat_file = io.loadmat(data_dir + file)
+    return mat_file
+
+data = load_data()
+
+print(data.keys()) # print entries of data dictionary
+
+# Assign relevant variables
+rate_maps = data['rateMap']
+grid_score = data['gridness']
 grid_score = np.nan_to_num(grid_score, nan=0) # replace 'nan' entries with '0'
 
 
 # change rate_maps to have a shape that is convenient for the functions used in 'dimensionality reduction'
-# to go around weird shaping of rate_maps and ignore 1st dimension
 rate_maps_all = []
 for i in range(len(grid_score)):
     eff_rate_map = np.nan_to_num(rate_maps[i][0], nan=0) # replace nan entries with zero
-    rate_maps_all.append(eff_rate_map) 
+    rate_maps_all.append(eff_rate_map) # to go around weird shaping of rate_maps and ignore 1st dimension
 
 has_nan = np.isnan(rate_maps_all).any() # optional: checks there still are any 'nan' entries
 
@@ -58,12 +76,31 @@ def grid_module_condition(cluster):
 modules = dim_red.id_grid_modules(reduced_data, cluster_info, condition=grid_module_condition, plots=False)
 print(modules)
 
+# Saves index of grid cell of each module in a list of arrays
+n_modules = max(modules.keys())
+grid_mod_id = 1
+indices_modules = []
+
+while grid_mod_id <= n_modules:
+    indices = modules[grid_mod_id]['index']
+    indices_modules.append(indices)
+    grid_mod_id+=1
+
+print(indices_modules[0])
+print(indices_modules)
+
 # Saves results to a .mat file
-scipy.io.savemat("grid_modules.mat", modules)
+index_data = {f"module_{key}": value["index"] for key, value in modules.items()} # Extract only the 'index' entries from the modules dictionary
+scipy.io.savemat("grid_modules_index.mat", index_data) # Save the extracted data to a .mat file
+
+#modules = {str(key): value for key, value in modules.items()} # Convert integer keys to strings
+#scipy.io.savemat("grid_modules.mat", modules)
+
 
 
 #-------- Optional -------#
-#-- Plot autocorrelograms & rate maps of cell in modules --#
+
+# Plot autocorrelograms & rate maps of cell in modules
 
 #n_modules = max(modules.keys())
 #grid_mod_id = 1
@@ -93,6 +130,5 @@ scipy.io.savemat("grid_modules.mat", modules)
 #        plt.savefig(os.path.join(folder_name, f'rate_map_neuron_{j}.png'), format='png')
         
 #    grid_mod_id+=1
-
 
 
