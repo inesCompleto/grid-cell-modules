@@ -35,7 +35,7 @@ def dim_red_algorithm(method, args, data, plots=True):
     else:
         print('Should one of the following methods: pca, umap or tsne')
         
-    reduced_data = model.fit_transform(data.T)  
+    reduced_data = model.fit_transform(data)  
 
     if plots==True:
         plt.figure(figsize=(4, 4))

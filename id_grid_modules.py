@@ -60,7 +60,7 @@ zscored_matrix = pp.zscore_spatial_autocorr(autocorrelograms)
 # Options: tsne or umap. args = perplexity for tsne and min_dist for umap
 args = [6] # tsne
 #args=[0.3] # umap
-reduced_data = dim_red.dim_red_algorithm('tsne', args, zscored_matrix, plots=False) 
+reduced_data = dim_red.dim_red_algorithm('tsne', args, zscored_matrix.T, plots=False) 
 
 
 #-------- Clustering of grid cell modules -------#
@@ -92,10 +92,6 @@ print(indices_modules)
 # Saves results to a .mat file
 index_data = {f"module_{key}": value["index"] for key, value in modules.items()} # Extract only the 'index' entries from the modules dictionary
 scipy.io.savemat("grid_modules_index.mat", index_data) # Save the extracted data to a .mat file
-
-#modules = {str(key): value for key, value in modules.items()} # Convert integer keys to strings
-#scipy.io.savemat("grid_modules.mat", modules)
-
 
 
 #-------- Optional -------#
