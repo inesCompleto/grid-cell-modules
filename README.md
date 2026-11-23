@@ -193,25 +193,3 @@ The main script also contains commented-out code for visualising:
 - Mean autocorrelograms for each identified module.
 
 These visualisations can be enabled to inspect the spatial characteristics of the identified modules.
-
-## Parameters
-
-The main parameters currently used in the analysis are:
-
-| Parameter | Default value | Description |
-|---|---:|---|
-| Dimensionality reduction | t-SNE | Embedding algorithm |
-| t-SNE perplexity | 6 | Local neighbourhood parameter |
-| UMAP min_dist | 0.3 | Minimum distance between embedded points |
-| Minimum neighbours | 3 | Clustering parameter |
-| Mean gridness threshold | 0.3 | Minimum mean gridness score for module identification |
-
-These parameters can be adjusted depending on the dataset and the characteristics of the neuronal population being analysed.
-
-## Notes and considerations
-
-- The analysis assumes that input data are provided in MATLAB `.mat` format.
-- The structure and dimensions of the input firing-rate maps must be compatible with the preprocessing functions.
-- NaN values are currently replaced with zeros. This preprocessing choice should be considered when interpreting the results.
-- Dimensionality-reduction and clustering parameters may influence the identified modules.
-- The resulting clusters should be interpreted in the context of the underlying neuronal firing patterns and gridness scores.
